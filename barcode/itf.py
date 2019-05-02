@@ -12,9 +12,8 @@ from barcode.errors import *
 """
 __docformat__ = 'restructuredtext en'
 
-
 MIN_SIZE = 0.2
-MIN_QUIET_ZONE = 6.4
+MIN_QUIET_ZONE = 1
 
 
 class ITF(Barcode):
@@ -57,7 +56,7 @@ class ITF(Barcode):
         data = itf.START
         for i in range(0, len(self.code), 2):
             bars_digit = int(self.code[i])
-            spaces_digit = int(self.code[i+1])
+            spaces_digit = int(self.code[i + 1])
             for j in range(5):
                 data += itf.CODES[bars_digit][j].upper()
                 data += itf.CODES[spaces_digit][j].lower()
@@ -75,7 +74,12 @@ class ITF(Barcode):
         return [raw]
 
     def render(self, writer_options, text=None):
-        options = dict(module_width=MIN_SIZE/self.narrow,
-                       quiet_zone=MIN_QUIET_ZONE)
+        options = dict(
+            module_width=MIN_SIZE / self.narrow,
+            quiet_zone=MIN_QUIET_ZONE,
+            text_distance=1,
+            module_height=7
+        )
+
         options.update(writer_options or {})
         return Barcode.render(self, options, text)

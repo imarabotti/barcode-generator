@@ -3,34 +3,50 @@ import os
 
 import boto3
 
-from barcode.itf import ITF
+from barcode.itf import ITF, IllegalCharacterError
 from barcode.writer import ImageWriter
 
 
 def main(event, context):
     data = json.loads(event['body'])
 
-    barcode = ITF(data['barcode'], writer=ImageWriter())
+    try:
+        barcode = ITF(data['barcode'], writer=ImageWriter())
 
-    barcode.save('/tmp/barcode')
+        barcode.save('/tmp/barcode')
 
-    s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3')
 
-    barcode_data = open('/tmp/barcode.png', 'rb')
+        barcode_data = open('/tmp/barcode.png', 'rb')
 
-    s3.Bucket(os.environ['bucket']).put_object(Key='barcodes/{0}.png'.format(data['name']), Body=barcode_data)
+        s3.Bucket(os.environ['bucket']).put_object(
+            Key='barcodes/{0}.png'.format(data['name']),
+            Body=barcode_data,
+            ACL='public-read'
+        )
 
-    response_body = {
-        "message": "Codigo de barras generado {0}.png".format(data['name'])
-    }
+        response_body = {
+            "message": "Codigo de barras generado {0}.png".format(data['name'])
+        }
 
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(response_body)
-    }
+        response = {
+            "statusCode": 200,
+            "body": json.dumps(response_body)
+        }
 
-    return response
+        return response
+
+    except IllegalCharacterError:
+        response = {
+            "statusCode": 200,
+            "body": json.dumps({
+                "message": "El codigo de barras es incorrecto {0}".format(data['barcode'])
+            })
+        }
+
+        return response
 
 
 if __name__ == '__main__':
-    main({'Records': [{'body': '{"barcode": "12312311123312441233"}'}]}, None)
+    response = main({'body': '{"barcode": "168701224123a00319051001308900190516013416006", "name": "12"}'}, None)
+    print(response)
