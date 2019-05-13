@@ -48,5 +48,5 @@ def main(event, context):
 
 
 if __name__ == '__main__':
-    response = main({'body': '{"barcode": "168701224123a00319051001308900190516013416006", "name": "12"}'}, None)
+    response = main({'body': '{"barcode": "044726000000719061002400000002460000000000000012345678944", "name": "2"}'}, None)
     print(response)

@@ -12,8 +12,8 @@ from barcode.errors import *
 """
 __docformat__ = 'restructuredtext en'
 
-MIN_SIZE = 0.15
-MIN_QUIET_ZONE = 0.3
+MIN_SIZE = 0.2
+MIN_QUIET_ZONE = 0
 
 
 class ITF(Barcode):
@@ -77,8 +77,8 @@ class ITF(Barcode):
         options = dict(
             module_width=MIN_SIZE / self.narrow,
             quiet_zone=MIN_QUIET_ZONE,
-            text_distance=1,
-            module_height=12
+            text_distance=2,
+            module_height=7
         )
 
         options.update(writer_options or {})
